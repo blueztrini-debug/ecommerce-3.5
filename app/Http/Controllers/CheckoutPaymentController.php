@@ -2,24 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Auth;
+
+use App\Models\Order;
+use App\Traits\PhpFlasher;
 use App\Helpers\ShippingHelper;
 use App\Helpers\StripeCheckout;
-use App\Models\Order;
+use Illuminate\Support\Facades\Auth;
 
 
 class CheckoutPaymentController extends Controller
 {
 
 
-    /**
-     * Undocumented function
-     *
-     * @param [type] $payment
-     * @return void
-     */
+    use PhpFlasher;
     public function index($payment)
-    { // Get groups
+    {
+        // Get groups
         $groups = Auth::check() ? Auth::user()->getGroups() : [1];
 
         // Get user and stores in a variable.
@@ -50,18 +48,18 @@ class CheckoutPaymentController extends Controller
 
 
             default:
-            insert_data = [
-                'payment_provider'  => 'testing',
-                'payment_id'        => 'testing
-                };
+                $insert_data = [
+                    'payment_provider'  => 'testing',
+                    'payment_id' => 'testing',
+                ];
                 $completed = true;
                 break;
         }
 
-            // Validate
+
+        // Validate
         if (!$completed || empty($insert_data)) {
             dd('Payment is incomplete or checkout is missing');
-
         }
 
 

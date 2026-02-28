@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 
-use App\Models\Order;
-use App\Traits\PhpFlasher;
 use App\Helpers\ShippingHelper;
 use App\Helpers\StripeCheckout;
+use App\Models\Order;
+use App\Models\OrderProduct;
+use App\Traits\PhpFlasher;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -65,10 +66,42 @@ class CheckoutPaymentController extends Controller
 
 
         // Create order details
+        $order->user_id = $user->id;
+        $order->order_no = '1234';
+        $order->subtotal = $cart_data->getSubtotal();
+        $order->total = $cart_data->otal();
+        $order->payment_provider = $insert_data['payment_provider'];
+        $order->shipping_id = 1;
+        $order->shipping_address_id = 1;
+        $order->billing_address_id = 1;
+        $order->payment_status = 'unpaid';
+        $order->save();
+
+
 
         // Create order details
+        $records = [];
 
-        // Redirect
-        return true;
-    }
-}
+        foreach (cart_data as $data)
+             array_push(
+                    $records,
+                    new OrderProduct(
+                        [
+                            'product_id' => $data->id,
+                            'user_id' => $user->id,
+                            'price' => $data->getPrice(),
+                            'quantity' => $data->pivot->quantity,
+
+                            ]
+                    )
+                );
+            }
+
+
+
+            $order->order_products()->saveMany($records);
+
+            //redirect
+            if (payment == 'stripe') {
+                return redirect()->route('checkout.stripe', ['order' => $order->id]);
+            }

@@ -65,12 +65,13 @@ class CheckoutPaymentController extends Controller
 
 
 
-        // Create order details
+        // Create order
         $order->user_id = $user->id;
         $order->order_no = '1234';
         $order->subtotal = $cart_data->getSubtotal();
-        $order->total = $cart_data->otal();
+        $order->total = $cart_data->getTotal();
         $order->payment_provider = $insert_data['payment_provider'];
+        $order->payment_id = $insert_data['payment_id'];
         $order->shipping_id = 1;
         $order->shipping_address_id = 1;
         $order->billing_address_id = 1;
@@ -82,26 +83,32 @@ class CheckoutPaymentController extends Controller
         // Create order details
         $records = [];
 
-        foreach (cart_data as $data)
-             array_push(
-                    $records,
-                    new OrderProduct(
-                        [
-                            'product_id' => $data->id,
-                            'user_id' => $user->id,
-                            'price' => $data->getPrice(),
-                            'quantity' => $data->pivot->quantity,
+        foreach ($cart_data as $data) {
+            array_push(
 
-                            ]
-                    )
-                );
-            }
+                $records,
+                new OrderProduct(
+                    [
+                        'product_id' => $data->id,
+                        'user_id' => $user->id,
+                        'price' => $data->getPrice(),
+                        'quantity' => $data->pivot->quantity,
+
+                    ]
+                )
+            );
+        }
 
 
 
-            $order->order_products()->saveMany($records);
+        $order->order_products()->saveMany($records);
 
-            //redirect
-            if (payment == 'stripe') {
-                return redirect()->route('checkout.stripe', ['order' => $order->id]);
-            }
+        //redirect
+
+        if ($payment == 'stripe') {
+            return redirect($stripe_checkout->getUrl());
+        }
+
+        dd('Payment was successful during testing');
+    }
+}

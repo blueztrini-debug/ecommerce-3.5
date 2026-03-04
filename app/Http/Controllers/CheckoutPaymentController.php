@@ -45,6 +45,19 @@ class CheckoutPaymentController extends Controller
         switch ($payment) {
             case 'stripe':
                 # code...
+
+                $stripe_checkout->startCheckoutSession();
+                $stripe_checkout->addEmail($user->email);
+                $stripe_checkout->addProducts($cart_data);
+                $stripe_checkout->addPointsCoupon();
+                $stripe_checkout->enablePromoCodes();
+                $shipping_data = $shipping_helper->getGroupShippingOptions();
+                $stripe_checkout->addShippingOptions($shipping_data);
+                $stripe_checkout->createSession();
+                $insert_data = $stripe_checkout->getOrderCreateData();
+                $completed = true;
+
+
                 break;
 
 
@@ -80,7 +93,7 @@ class CheckoutPaymentController extends Controller
 
 
 
-        // Create order details
+        // Create order details *look thru the items in the cart and for each item insert the data in order prdsucts table*
         $records = [];
 
         foreach ($cart_data as $data) {

@@ -52,6 +52,7 @@ class CheckoutPaymentController extends Controller
                 $stripe_checkout->addPointsCoupon();
                 $stripe_checkout->enablePromoCodes();
                 $shipping_data = $shipping_helper->getGroupShippingOptions();
+                // dd($shipping_data);
                 $stripe_checkout->addShippingOptions($shipping_data);
                 $stripe_checkout->createSession();
                 $insert_data = $stripe_checkout->getOrderCreateData();

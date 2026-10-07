@@ -79,7 +79,7 @@ class CheckoutPaymentController extends Controller
 
 
 
-        // Create order
+        // Create order details
         $order->user_id = $user->id;
         $order->order_no = '1234';
         $order->subtotal = $cart_data->getSubtotal();
@@ -114,7 +114,7 @@ class CheckoutPaymentController extends Controller
         }
 
 
-
+        // This will save the records and associate them with the order that was just created. The saveMany method will take care of inserting the records into the order_products table and associating them with the order.
         $order->order_products()->saveMany($records);
 
         //redirect
